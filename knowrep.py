@@ -10,175 +10,141 @@ Individual frame: Depression, Anxiety, Insomnia
 import datetime
 import utils
 
-#SLIDE: upper case for generic frames
-"Generic frame"
-class Directory:
-    def __init__(self):
-        "cosntructor"
-    "slot1 = IS_A  , filler = genericframe (<type>?)"
-    def IS_A(self, genericframe = "Directory"):#can i do this??? can a frame be an instance of itself
-        self.IS_A = genericframe #is IS A even needed here? confused
-    "slot2 = Name , filler = name (string)"
-    def Name(self, name):
-        self.Name = name
-    "slot3 = FirstPatient , filler = firstPatient (pointer to Patient frame)"
-    def FirstPatient(self, firstPatient):
-        self.FirstPatient = firstPatient
-    "slot4 = LastPatient , filler = lastPatient (pointer to Patient frame)"
-    def LastPatient(self,lastPatient):
-        self.LastPatient = lastPatient
-    
-        
-#SLIDE: upper case for generic frames
-"Generic frame"
-class Patient:
+"***************************************** frame based kb module *****************************************"
+              
+class Person:
     def __init__(self):
         "constructor"
-    "slot1 = IS_A, filler = genericframe (<type>?)"
-    def IS_A(self,genericframe):
-        self.IS_A = genericframe
-    "slot2 = FirstName , filler = fname (string)"
-    def FirstName(self,name):
-        self.Name = name
-    "slot3 = LastName , filler = lname (string)"
-    def LastName(self, lname):
-        self.LastName = lname
-    "slot4 = Age , filler = age (int)"
-    def Age(self,age):
-        self.Age = age
-    "slot5 = Gender, filler = gender (char)"
-    def Gender(self,gender):
-        self.Gender = gender
-    "slot6 = Symptoms , filler = symptoms (string[])"
-    def Symptoms(self,symptoms):
-        self.Symptoms = symptoms
-    "slot7 = AdditionalInfo , filler = addInfo (string)" #to add to patient info concatenate addInfo with additional string
-    def AdditionalInfo(self,addInfo):
-        self.AdditionalInfo = addInfo
-    "slot8 = Diagnosis , filler  = diagnosisList (pointer to MentalIllness[])"
-    def Diagnosis(diagnosisList):
-        self.Diagnosis = diagnosisList
-            
-"Generic frame"
-class MentalIllness:
-    def __init__(self):
-        "constructor"
-    "Slot1 = IS_A, filler = genericframe (<type>?)" #???? can generic frame be an IS A of itself??
-    def IS_A(self, genericframe = "MentalIllness"):#what type should generic frame be??
-        self.IS_A = genericframe
-    "Slot2 = Name , filler = name (string)" 
+    "slot1 = Name , filler = name (string)"
     def Name(self,name):
-        self.Name = name
-    "Slot3  = PhysicalSymptoms, filler = symptoms (string[])"
-    def PhysicalSymptoms(self,physymptoms):
-        self.PhysicalSymptoms = physymptoms
-    "Slot4 = EmotionalSymptoms, filler = emosymptoms (string[])"
-    def EmotionalSymptoms(self,emosymptoms):
-        self.EmotionalSymptoms = emosymptoms
+        try:
+            self.Name = str(name)
+        except ValueError:
+            print "name must be a string"
+    "slot2 = Age , filler = age (int)"
+    def Age(self,age):
+        try:
+            self.Age = int(age)
+        except ValueError:
+            print "age must be an int"        
+    "slot3 = Gender, filler = gender (string): F,M"
+    def Gender(self,gender):
+        def IF_ADDED(gender):
+            if gender.lower() == 'male':
+                return 'M'
+            elif gender.lower() == 'female':
+                return 'F'
+        try:
+            self.Gender = str(IF_ADDED(gender))
+        except ValueError:
+            print "gender must be a string"
         
+
+
         
-            
-"Generic frame"          
-class Diagnosis:
+class Patient(Person):
     def __init__(self):
-        "constuctor"       
-    "Slot1 = Patient , filler  = patient (pointer to Patient)" #patient that diagnosis belongs to 
-    def Patient(self,patient):
-        self.Patient = patient
-    "Slot2 = SessionTime , filler = sessionTime (<type>?)"
-    def SessionTime(self,sessionTime):
-        self.SessionTime = sessionTime
-    "Slot3 = detectedConditions , filler = detectedCond (array of pointers to MentalIllness frames)"
-    def DetectedConditions(self,detectedCond):
-        self.DetectedConditions = detectedCond            
-    "Slot4 = NextPatient , filler = nextPatient (pointer to a Patient)" #may need to instantiante with if-needed or as-needed etc
-    def NextPatient(self,nextPatient):
-        self.NextPatient = nextPatient
-    "Slot5 = LastPatient , filler = lastPatient (boolean) " 
-    def LastPatient(self,lastPatient):
-        self.LastPatient = lastPatient
+        self.is_a = []
+        self.is_a.append(Person)        
+        self.as_instance = {}
+        self.Symptoms = []
+    "slot1 = IS_A, filler = frame (<class>)"
+    def IS_A(self,frame):
+        self.is_a.append(frame)
+    "slot2 = IS_A, filler = frame (<class>)"
+    def AS_INSTANCE(self, frame):
+        "{ClassName : ClassInstance (Class())}"
+        self.as_instance[frame.__name__] = frame()
+    "slot3 = Symptoms , filler = symptom (Symptom)"
+    def Symptoms(self,symptom):
+        try:
+            s = Symptom(symptom)
+        except ValueError:
+            print "symptom must be a Symptom object"
+        
+        
+"Generic frame"
+class TherapyPatient:
+    def __init__(self):
+        "list of Condition objects"
+        self.Diagnosis = []
+        self.as_instance = {}
+    "slot1 = IS_A, filler = frame (<class>)"
+    def AS_INSTANCE(self, frame):
+        "{ClassName : ClassInstance (Class())}"
+        self.as_instance[frame.__name__] = frame()
+    "slot2 = Diagnosis , filler  = condition (Condition)"
+    def Diagnosis(self,mentill):
+        def IF_ADDED(mentill):
+            if isinstance(mentill, MentalIllness):
+                return mentill
+        
+        self.Diagnosis.append(IF_ADDED(mentill))
         
 
-
-
-
-
-
-"""                         SEARCH - put in a seperate module
-**shweta will implement
-    
-I was thinking of passing in a Directory frame since Directory serves a root node/head 
-? Do we have different searches for different purposes?
-    ex: a search for a particular patient?
-    ex: a search for a particular mental illness?
-        def search_patient(...)
-        def search_illness(...)
-
-"""
-def search(Directory, frameToSearchFor):
-    "needs to be implemented"
-    "search could be in seperate module which will be imported"
-    
-    
-    
-
-def add_patient(name,age,gender):
-    "create a uniqueID for patient and create Patient variable during runtime using vars()"
-    "patientID = hash firstname , lastname, and datetime Patient object is being created"
-
-
-"""
-Note: main will be in the chatbot code
-    main in this module will be changed to set up method
-        additional methods:
-                methods that act as getters and setters for frames
-                display frame frame representation kb
-                new patient
+"Generic frame"
+class Symptom:
+    def __init__(self):
+        self.Synonyms = []
+    "slot1 = Name, filler = name (string)"
+    def Name(self,name):
+        try:
+            self.Name = str(name)
+        except ValueError:
+            print "name must be a string"
+    "slot2 = Synonyms, filler = synonym (string)"
+    def Synonyms(self,synomym):
+        try:
+            self.Synonyms.append(str(synomym))
+        except ValueError:
+            print "synonym must be a string"
         
-        need to work on
-            collect data for decision learning tree method 
-                = SEARCH
-"""
+
+            
+"Generic frame"
+class Condition:
+    def __init__(self):
+        "constructor"
+    "Slot1 = Name , filler = name (string)" 
+    def Name(self,name):
+        try:
+            self.Name = str(name)
+        except ValueError:
+            print "name must be a string"
+            
+            
+class MentalIllness(Condition):
+    def __init__(self):
+        self.is_a = []
+        self.is_a.append(Condition)
+        self.as_instance = {}
+        self.PhysicalSymptoms = []
+        self.EmotionalSymptoms = []
+    "Slot1 = IS_A, filler = frame (<class>)" 
+    def IS_A(self, frame):
+        self.is_a.append(frame)
+    "Slot2 = AS_INSTANCE , filler = frame (<class>)"
+    def AS_INSTANCE(self, frame):
+        "{ClassName : ClassInstance (Class())}"
+        self.as_instance[frame.__name__] = frame()
+    "Slot3  = PhysicalSymptoms, filler = symptom (Symptom)"
+    def PhysicalSymptoms(self,symptom):
+        self.PhysicalSymptoms.append(symptom)
+    "Slot4 = EmotionalSymptoms, filler = symptom (Symptom)"
+    def EmotionalSymptoms(self,symptom):
+        self.EmotionalSymptoms.append(symptom)
+        
+
 if __name__ == '__main__': 
     """test"""
-    "-------------------------MentalIllness frames + Directory frame will be created before patient converses with chatbot------------"
-    
-    "create Frame(Indivdual): depression"
-    depression = MentalIllness()
-    depression.Name("Depression")
-    depression.PhysicalSymptoms(["tired","exhausted", "weak", "trouble sleeping", "trouble waking up", "undereating", "overeating"])
-    depression.EmotionalSymptoms(["hopelessness","down", "sad", "irritable", "withdrawn","isolated", "discouraged", "guilty", "suicidal"])
-    
-    "create Frame(Individual); anxiety"
-    anxiety = MentalIllness()
-    anxiety.Name("Anxiety")
-    anxiety.PhysicalSymptoms(["shakiness", "sweaty", "heart palpitations","dizziness", "chest pain",
-        "headaches", "neck tension", "pulsing in ear", "nausea", "shortness of breath", "weakness in legs",
-        "sleep problems","inability to rest" , "restless", "racing throughts", "muscle tension", "dry mouth"])
-    anxiety.EmotionalSymptoms(["anxious", "emotionless", "disconnected" ])
-    
-    "create Frame(Individual): insomnia"
-    insomnia = MentalIllness()
-    insomnia.Name("Insomnia")
-    insomnia.PhysicalSymptoms(["fatigue", "tired", "cant concentrate", "daytime sleepiness"])
-    insomnia.EmotionalSymptoms(["unmotivated", "moody", "irritable"])
-    
-    
-    "create a directory"
-    directory = Directory()
-    dt = datetime.datetime.now()
-    directory.Name("chatbot therapy session : "+dt.strftime('%m/%d/%Y'))
    
-   
-    "-------------------------------Patient Frame will be created after chatbot gets info about current Patietn-----------------"
+    "create Depression frame"
+    depressionFrame = MentalIllness()
+    depressionFrame.
     
+
     
-    
-    
-    
-    "use extracted words/key words that can be used to fill in slots for the frames listed above"
-    """NOTE : instantiate a Patient class and fill in slot for lastPatient in Directory BEFORE user quits
-        update when another patient wants to start a session"""
+ 
 
    
 
@@ -228,4 +194,21 @@ http://slideplayer.com/slide/6224186/
 -frame provides storing of knowledge in slots
 -slot may contain a default value or a pointer to another frame, set of rules or a procedure by which slot value is obtained
     
+"""
+
+
+"""
+        Frame(Generic) - Person
+        -----------------------
+        -
+        - Name (string) 
+        - Age (int)
+        - Gender (string) 
+        -
+        -----------------------<-----------------Patient
+                                                --------------------
+        
+            
+        
+
 """
