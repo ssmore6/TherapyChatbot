@@ -9,6 +9,7 @@ Individual frame: Depression, Anxiety, Insomnia
 
 import datetime
 import utils
+import sys
 
 "***************************************** frame based kb module *****************************************"
               
@@ -47,7 +48,7 @@ class Patient(Person):
         self.is_a = []
         self.is_a.append(Person)        
         self.as_instance = {}
-        self.Symptoms = []
+        self.symptoms = []
     "slot1 = IS_A, filler = frame (<class>)"
     def IS_A(self,frame):
         self.is_a.append(frame)
@@ -57,17 +58,15 @@ class Patient(Person):
         self.as_instance[frame.__name__] = frame()
     "slot3 = Symptoms , filler = symptom (Symptom)"
     def Symptoms(self,symptom):
-        try:
-            s = Symptom(symptom)
-        except ValueError:
-            print "symptom must be a Symptom object"
-        
+        if isinstance(symptom, Symptom):
+            self.symptoms.append(symptom)
+
         
 "Generic frame"
 class TherapyPatient:
     def __init__(self):
         "list of Condition objects"
-        self.Diagnosis = []
+        self.diagnosis = []
         self.as_instance = {}
     "slot1 = IS_A, filler = frame (<class>)"
     def AS_INSTANCE(self, frame):
@@ -75,17 +74,14 @@ class TherapyPatient:
         self.as_instance[frame.__name__] = frame()
     "slot2 = Diagnosis , filler  = condition (Condition)"
     def Diagnosis(self,mentill):
-        def IF_ADDED(mentill):
-            if isinstance(mentill, MentalIllness):
-                return mentill
-        
-        self.Diagnosis.append(IF_ADDED(mentill))
-        
+        if isinstance(mentill, MentalIllness):
+            self.diagnosis.append(mentill)
+
 
 "Generic frame"
 class Symptom:
     def __init__(self):
-        self.Synonyms = []
+        self.synonyms = []
     "slot1 = Name, filler = name (string)"
     def Name(self,name):
         try:
@@ -93,9 +89,9 @@ class Symptom:
         except ValueError:
             print "name must be a string"
     "slot2 = Synonyms, filler = synonym (string)"
-    def Synonyms(self,synomym):
+    def Synonyms(self,synonym):
         try:
-            self.Synonyms.append(str(synomym))
+            self.synonyms.append(str(synonym))
         except ValueError:
             print "synonym must be a string"
         
@@ -110,7 +106,7 @@ class Condition:
         try:
             self.Name = str(name)
         except ValueError:
-            print "name must be a string"
+           print "name must be a string"
             
             
 class MentalIllness(Condition):
@@ -118,8 +114,8 @@ class MentalIllness(Condition):
         self.is_a = []
         self.is_a.append(Condition)
         self.as_instance = {}
-        self.PhysicalSymptoms = []
-        self.EmotionalSymptoms = []
+        self.phy_symptoms = []
+        self.emo_symptoms = []
     "Slot1 = IS_A, filler = frame (<class>)" 
     def IS_A(self, frame):
         self.is_a.append(frame)
@@ -129,10 +125,10 @@ class MentalIllness(Condition):
         self.as_instance[frame.__name__] = frame()
     "Slot3  = PhysicalSymptoms, filler = symptom (Symptom)"
     def PhysicalSymptoms(self,symptom):
-        self.PhysicalSymptoms.append(symptom)
+        self.phy_symptoms.append(symptom)
     "Slot4 = EmotionalSymptoms, filler = symptom (Symptom)"
     def EmotionalSymptoms(self,symptom):
-        self.EmotionalSymptoms.append(symptom)
+        self.emo_symptoms.append(symptom)
         
 
 if __name__ == '__main__': 
@@ -140,45 +136,57 @@ if __name__ == '__main__':
    
     "create Depression frame"
     depressionFrame = MentalIllness()
-    depressionFrame.
+    depressionFrame.Name(2.3)
     
-
+    "create Symptom frames for Depression frames"
+    "emotional"
+    sadFrame = Symptom()
+    sadFrame.Name('Sad')
+    sad_syns = ['Low', 'Down', 'Unhappy', 'Downcast', 'Heartbroken','Glum','Gloomy','Doleful','Despairing']
+    for x in sad_syns:
+        sadFrame.Synonyms(x)
+    depressionFrame.EmotionalSymptoms(sadFrame)
     
+    "physical"
+    tiredFrame = Symptom()
+    tiredFrame.Name('Tired')
+    tired_syns = ['Exhausted','Weary', 'Fatigued','Drained','Enervated']
+    for x in tired_syns:
+        tiredFrame.Synonyms(x)
+    depressionFrame.PhysicalSymptoms(tiredFrame)
+        
+    weightFrame = Symptom()
+    weightFrame.Name('Weight Change')
+    weight_syns = ['Weight gain','Weight loss', 'Fatter', 'Skinnier', 'Thinner']
+    for x in weight_syns:
+        weightFrame.Synonyms(x)   
+    depressionFrame.PhysicalSymptoms(weightFrame)
  
+        
+    sleepFrame = Symptom()
+    sleepFrame.Name('Sleep Changes')
+    sleep_syns = ['Early','Awakening', 'Excess sleepiness', 'Insomnia', 'Restless sleep', 'Sleepier']
+    for x in sleep_syns:
+        sleepFrame.Synonyms(x)
+    depressionFrame.PhysicalSymptoms(sleepFrame)
 
+    
+    appetiteFrame = Symptom()
+    appetiteFrame.Name('Appetite Changes')
+    appetite_syns = ['More hungry', 'Less Hungry', 'Hungrier', 'Starving']
+    for x in appetite_syns:
+        appetiteFrame.Synonyms(x)
+    depressionFrame.PhysicalSymptoms(appetiteFrame)
+
+    
+    cognitiveFrame = Symptom()
+    cognitiveFrame.Name('Cognitive Changes')
+    cog_syns = ['lack of concentration', 'slowness in activity', 'thoughts of suicide']
+    for x in cog_syns:
+        cognitiveFrame.Synonyms(x)    
+    depressionFrame.PhysicalSymptoms(cognitiveFrame)
    
-
-
-"""
-comments:       
     
-    Basic idea (incomplete)
-    *can even have a slot in patient that contains pointer to its respective directory4
-    *ref - SLIDE 28 OF week_9_slides_v1
-    
-    -------------           -------------           --------------
-    - Directory -----------> Patient    ----------->    Diagnosis
-    -  (dir1)   -           _ (patient1)_           - (diagnosis1)
-    -------------           -------------           --------------
-    
-"""
-
-"""
-questions:
-    Can we have two seperate networks of frames?
-        or do all the frames that exist have to be connected in one way or another?
-    Do all the frames have to strictly be one module
-        or can a knowldege base module have additional methods
-"""
-
-"""
-TO DO:
-    add procedures, if needed, if added
-    in comments above each class comment in a frame structure with <>'s like in slides   
-    remove comments following # later
-    check with professor to see if this is all correct
-"""
-
 
 
 
@@ -196,19 +204,3 @@ http://slideplayer.com/slide/6224186/
     
 """
 
-
-"""
-        Frame(Generic) - Person
-        -----------------------
-        -
-        - Name (string) 
-        - Age (int)
-        - Gender (string) 
-        -
-        -----------------------<-----------------Patient
-                                                --------------------
-        
-            
-        
-
-"""
